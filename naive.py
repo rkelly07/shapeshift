@@ -1,3 +1,5 @@
+# CURRENTLY OUTDATED
+
 # Given intial boat configurations and a goal configuration
 # return the intermediate configurations in order to reach the goal
 def shapeshift(init_configs, goal_config):

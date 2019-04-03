@@ -4,6 +4,9 @@ import graph_tool.all as gt
 # to the goal configuration
 def shapeshift(initial_configuration, goal_configuration):
     planner_steps = []
+
+    # This vertex property is created to keep track of what boats have already been accounted for in the shapeshift
+    # this is necessary for setting the vertex filter so that we update the graph accordingly
     used_initial_nodes = initial_configuration.new_vertex_property('bool')
     for node in initial_configuration.vertices():
         used_initial_nodes[node] = 1
@@ -11,22 +14,25 @@ def shapeshift(initial_configuration, goal_configuration):
     for node in goal_configuration.vertices():
         used_goal_nodes[node] = 1
 
+    # This loop will construct the actual plan
     while True:
         initial_configuration.set_vertex_filter(used_initial_nodes)
         goal_configuration.set_vertex_filter(used_goal_nodes)
-
+        # If there is only one vertex left in the initial config we are done
+        # as that vertex is the coordinator and it is apart of both structures
         if len(list(initial_configuration.vertices())) == 1:
             break
-            
+        # find_overlap is the greedy algorithm that finds the maximum overlap between the init and goal
         current_steps = find_overlap(initial_configuration, goal_configuration)
         planner_steps.append(current_steps)
-        
+        # We now will update the nodes in the graph that have been used in the step so that we can update the filter
         for step in current_steps:
             used_initial_nodes[step[0]] = 0
             used_goal_nodes[step[1]] = 0
 
     return planner_steps
         
+# This method performs all of the greedy overlap calculation and is the core of the algorithm
 def find_overlap(current_configuration, goal_configuration):
     # Create Children and parent properties for their respective graphs
     current_children = current_configuration.new_vertex_property("vector<int>")
@@ -45,12 +51,12 @@ def find_overlap(current_configuration, goal_configuration):
     matching = []
     # Iterate through the leaf nodes in the current_configuration
     for potential_leaf in current_configuration.vertices():
-        # Make sure we are only examining leafs from the breadth first search
+        # Make sure we are only examining LEAFS from the breadth first search
         if len(current_children[potential_leaf]) > 0 or potential_leaf == 0:
             continue
         # Now iterate through all of the roots in the goal (direct connection to coordinator)
         for potential_root in goal_configuration.vertices():
-            # Make sure we are only examining roots
+            # Make sure we are only examining ROOTS
             if goal_parent[potential_root] != 0 or potential_root == 0:
                 continue
             stack_current = [potential_leaf]
