@@ -80,8 +80,7 @@ def find_overlap(current_configuration, goal_configuration):
                         for current_goal_edge in current_goal_edges:
                             if (current_configuration.edge_properties["connection_type"][current_node_edge] == 
                             goal_configuration.edge_properties["connection_type"][current_goal_edge]):
-                                print(max_overlap_size)
-                                if len(current_overlap) < max_overlap_size-2:
+                                if len(current_overlap) < max_overlap_size-1:
                                     stack_current.append(current_node_edge.target())
                                     stack_goal.append(current_goal_edge.target())
                                     current_visited.add(current_node_edge.target())
@@ -115,26 +114,53 @@ def determine_new_grid_location(edge_type, parent_location):
 # This method determines if the current overlapped vertices are valid with respect to the geometric constraints
 def valid_overlap(grid_locations):
     num_boats = len(grid_locations)
-    grid = [[0 for _ in range(2*num_boats)] for _ in range(2*num_boats)]
+    # grid = [[0 for _ in range(2*num_boats)] for _ in range(2*num_boats)]
+    grid = {}
     # build the mapping grid of where the boats occupy
+    # for boat in grid_locations:
+    #     grid[grid_locations[boat][0][0]][grid_locations[boat][0][1]] = boat
+    #     grid[grid_locations[boat][1][0]][grid_locations[boat][1][1]] = boat
     for boat in grid_locations:
-        grid[grid_locations[boat][0][0]][grid_locations[boat][0][1]] = boat
-        grid[grid_locations[boat][1][0]][grid_locations[boat][1][1]] = boat
+        grid[grid_locations[boat][0]] = boat
+        grid[grid_locations[boat][1]] = boat
+    for i in range(-num_boats,num_boats):
+        vertical_checker_1 = None
+        vertical_checker_2 = None
+        horizontal_checker_1 = None
+        horizontal_checker_2 = None
+        for j in range(-num_boats,num_boats):
+            if vertical_checker_1 == False and ((i,j) in grid or (i,j+1) in grid):
+                print("vert1")
+                return False
+            if (i,j) in grid and (i,j+1) in grid:
+                vertical_checker_1 = True
+            elif vertical_checker_1 == True:
+                vertical_checker_1 = False
 
-    for i in range(2*num_boats):
-        vertical_checker = False
-        horizontal_checker = False
-        for j in range(2*num_boats):
-            if j != 2*num_boats:
-                if grid[i][j] != 0 and grid[i][j+1] != 0:
-                    vertical_checker = True
-                elif vertical_checker == True:
-                    return False
-            if i != 2*num_boats:
-                if grid[i][j] != 0 and grid[i+1][j] != 0:
-                    horizontal_checker = True
-                elif horizontal_checker == True:
-                    return False
+            if vertical_checker_2 == False and ((j,i) in grid or (j,i+1) in grid):
+                print("vert2")
+                return False
+            if (j,i) in grid and (j,i+1) in grid:
+                vertical_checker_2 = True
+            elif vertical_checker_2 == True:
+                vertical_checker_2 = False
+
+            # if horizontal_checker_1 == False and ((i,j) in grid or (i+1,j) in grid):
+            #     print("hor1")
+            #     return False
+            # if (i,j) in grid and (i+1,j) in grid:
+            #     horizontal_checker_1 = True
+            # elif horizontal_checker_1 == True:
+            #     horizontal_checker_1 = False
+
+            # if horizontal_checker_2 == False and ((j,i) in grid or (j+1,i) in grid):
+            #     print("hor 2")
+            #     return False
+            # if (j,i) in grid and (j+1,i) in grid:
+            #     print grid[(i,j)]
+            #     horizontal_checker_2 = True
+            # elif horizontal_checker_2 == True:
+            #     horizontal_checker_2 = False
     return True
 
 
