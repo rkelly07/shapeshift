@@ -4,7 +4,7 @@ import graph_tool.all as gt
 # to the goal configuration
 def shapeshift(initial_configuration, goal_configuration):
     planner_steps = []
-
+    coordinator_latching_points = []
     # This vertex property is created to keep track of what boats have already been accounted for in the shapeshift
     # this is necessary for setting the vertex filter so that we update the graph accordingly
     used_initial_nodes = initial_configuration.new_vertex_property('bool')
@@ -25,6 +25,7 @@ def shapeshift(initial_configuration, goal_configuration):
         # find_overlap is the greedy algorithm that finds the maximum overlap between the init and goal
         current_steps = find_overlap(initial_configuration, goal_configuration)
         planner_steps.append(current_steps)
+        
         # We now will update the nodes in the graph that have been used in the step so that we can update the filter
         for step in current_steps:
             used_initial_nodes[step[0]] = 0
