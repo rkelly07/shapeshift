@@ -4,7 +4,6 @@ import graph_tool.all as gt
 # to the goal configuration
 def shapeshift(initial_configuration, goal_configuration):
     planner_steps = []
-    coordinator_latching_points = []
     # This vertex property is created to keep track of what boats have already been accounted for in the shapeshift
     # this is necessary for setting the vertex filter so that we update the graph accordingly
     used_initial_nodes = initial_configuration.new_vertex_property('bool')
